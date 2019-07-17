@@ -1,5 +1,6 @@
 from twython import Twython
 from pprint import pprint
+from google.cloud import bigquery
 import json
 
 def twitter_auth():
@@ -20,15 +21,28 @@ def twitter_auth():
 
 def fetch_data(twitter):
     try:
-        result = twitter.search(q='flooding&fire', geocode='53.8108176,-1.76261,20km')
-        #print(result)
-        for i in result['statuses']:
-            #pprint(i)
-            print(i['created_at'])
-            print('text: ',i['text'])
-            print(i['user']['location'])
-            print(i['place']['full_name'])
-            
+        data = []
+        incident_data = {'date': '', 'tweet': '', 'location': '', 'keyword': ''}
 
+        result = twitter.search(q='flooding', geocode='53.8108176,-1.76261,20km')
+
+        for i in result['statuses']:
+            incident_data['date'] = i['created_at']
+            print(i['created_at'])
+            incident_data['tweet'] = i['text']
+            print(i['text'])
+            incident_data['location'] = i['place']
+            print(i['place'])
+            incident_data['keyword'] = 'flooding'
+            data.append(incident_data)
+            incident_data = {'date': '', 'tweet': '', 'location': '', 'keyword': ''}
+
+        print(data)
     except Exception as e:
         print(e)
+
+def push_to_bq(data):
+
+if __name__ == "__main__":
+    twitter = twitter_auth()
+    fetch_data(twitter)
