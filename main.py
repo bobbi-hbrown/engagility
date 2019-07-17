@@ -1,7 +1,9 @@
 from twython import Twython
 from pprint import pprint
 from google.cloud import bigquery
+from google.oauth2 import service_account
 import json
+import os
 
 def twitter_auth():
 
@@ -42,6 +44,13 @@ def fetch_data(twitter):
         print(e)
 
 def push_to_bq(data):
+
+    current_directory = os.getcwd()
+    service_account_file = current_directory + 'service-account.json'
+    bq_credentials = service_account.Credentials.from_service_account_file(service_account_file)
+
+    # Instantiate BQ client and pass in credentials
+    client = bigquery.Client(credentials=bq_credentials)
 
 if __name__ == "__main__":
     twitter = twitter_auth()
