@@ -2,6 +2,7 @@ from twython import Twython
 from pprint import pprint
 from google.cloud import bigquery
 from google.oauth2 import service_account
+import pandas as pd
 import json
 import os
 
@@ -22,35 +23,48 @@ def twitter_auth():
     return twitter
 
 def fetch_data(twitter):
+    
     try:
-        data = []
-        incident_data = {'date': '', 'tweet': '', 'location': '', 'keyword': ''}
+
+        incident_data = {'date': [], 'tweet': [], 'location': [], 'keyword': []}
 
         result = twitter.search(q='flooding', geocode='53.8108176,-1.76261,20km')
 
         for i in result['statuses']:
-            incident_data['date'] = i['created_at']
+            incident_data['date'].append(['created_at'])
             print(i['created_at'])
-            incident_data['tweet'] = i['text']
+            incident_data['tweet'].append(i['text'])
             print(i['text'])
-            incident_data['location'] = i['place']
+            incident_data['location'].append(i['place'])
             print(i['place'])
-            incident_data['keyword'] = 'flooding'
-            data.append(incident_data)
-            incident_data = {'date': '', 'tweet': '', 'location': '', 'keyword': ''}
+            incident_data['keyword'].append('flooding')
 
-        print(data)
+        dataframe = pd.DataFrame(incident_data)
+        incident_data = {'date': '', 'tweet': '', 'location': '', 'keyword': ''}
+
+        print(dataframe)
+        
     except Exception as e:
         print(e)
 
-def push_to_bq(data):
+    return dataframe
 
+def push_pandas_to_bigquery(df, gsc_table):
+
+    # Service account variables for authentication
     current_directory = os.getcwd()
     service_account_file = current_directory + 'service-account.json'
-    bq_credentials = service_account.Credentials.from_service_account_file(service_account_file)
+    bigquery_credentials = service_account.Credentials.from_service_account_file(service_account_file)
 
-    # Instantiate BQ client and pass in credentials
-    client = bigquery.Client(credentials=bq_credentials)
+    client = bigquery.Client(credentials=bigquery_credentials)
+    bigquery_config = bigquery.job.LoadJobConfig(ignore_unknown_values=True)
+    dataset_ref = client.dataset('engagility')
+    table_ref = dataset_ref.table('incidents')
+
+    client.load_table_from_dataframe(df, table_ref, job_config=bigquery_config).result()
+    print("%s loaded to BQ" % (df))
+
+
 
 if __name__ == "__main__":
     twitter = twitter_auth()
