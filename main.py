@@ -23,7 +23,7 @@ def twitter_auth():
     return twitter
 
 def fetch_data(twitter):
-    
+
     try:
 
         incident_data = {'date': [], 'tweet': [], 'location': [], 'keyword': []}
@@ -49,11 +49,11 @@ def fetch_data(twitter):
 
     return dataframe
 
-def push_pandas_to_bigquery(df, gsc_table):
+def push_pandas_to_bigquery(df):
 
     # Service account variables for authentication
     current_directory = os.getcwd()
-    service_account_file = current_directory + 'service-account.json'
+    service_account_file = current_directory + '/service-account.json'
     bigquery_credentials = service_account.Credentials.from_service_account_file(service_account_file)
 
     client = bigquery.Client(credentials=bigquery_credentials)
@@ -68,4 +68,5 @@ def push_pandas_to_bigquery(df, gsc_table):
 
 if __name__ == "__main__":
     twitter = twitter_auth()
-    fetch_data(twitter)
+    df = fetch_data(twitter)
+    push_pandas_to_bigquery(df)
