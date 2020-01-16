@@ -1,7 +1,4 @@
 # engagility
-
-This contains part of the work from our accessibile dashboard, which integrated open datasets and real-time updates from Twitter, for ODI Leeds' Hack for Impact event.
-
 https://odileeds.org/events/hackforimpact/
 
 The dashboard prototype:
