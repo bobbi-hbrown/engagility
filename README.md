@@ -1,6 +1,8 @@
 # engagility
 https://odileeds.org/events/hackforimpact/
 
+Hack for a Impact was a 2-day hackathon which explored the use of open data sets.
+
 The dashboard prototype:
 https://datastudio.google.com/u/0/reporting/1I8XtPcHaQ1NWNPgwZmvy66AF0Ysrj3jD/page/hW4u?s=leGPcePUfcI
 
